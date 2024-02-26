@@ -2,7 +2,7 @@
 A 2D game engine written in Python using both SDL2 and PyGame.
 
 # Getting Started
-## How to install?
+## How to install.
 ```
 pip install ReForge
 ```
@@ -38,7 +38,7 @@ def reforgeEntry(argc: int, argv: reforge.List[str]) -> int:
 ```python
 import os
 
-os.environ["REFORGE_API"] = "pygame"
+os.environ["REFORGE_API"] = "sdl2"
 
 import reforge, ctypes
 
