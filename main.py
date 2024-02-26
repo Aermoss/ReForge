@@ -1,5 +1,6 @@
-import os
+import os, sys
 
+sys.dont_write_bytecode = True
 os.environ["REFORGE_API"] = "sdl2"
 
 import reforge, ctypes
