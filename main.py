@@ -1,6 +1,6 @@
 import os
 
-os.environ["REFORGE_API"] = "pygame"
+os.environ["REFORGE_API"] = "sdl2"
 
 import reforge, ctypes
 
