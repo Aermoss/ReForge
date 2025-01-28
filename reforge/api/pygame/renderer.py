@@ -1,13 +1,13 @@
-import reforge.api.tools, reforge.api.event, pygame, inspect
+import reforge.api, pygame
 
-from reforge.math import Vector4
+from reforge.math import Vector2, Vector3, Vector4
 
 class Renderer:
     def __init__(self, window, vsync = False) -> None:
-        reforge.api.tools.addInstance(__name__, self)
+        reforge.api.instanceHandler.addInstance(__name__, self)
         self.window, self.vsync = window, vsync
         self._surface = pygame.display.set_mode((self.window.width, self.window.height), self.window.flags, vsync = self.vsync)
-        self.drawColor = Vector4(0, 0, 0, 255)
+        self.drawColor = Vector4(0.0, 0.0, 0.0, 255.0)
 
     def setDrawColor(self, color: Vector4) -> None:
         self.drawColor = color
@@ -17,36 +17,35 @@ class Renderer:
 
     def setVSync(self, vsync: bool) -> None:
         self.vsync = vsync
-        try: self._surface = pygame.display.set_mode((self.window.width, self.window.height), self.window.flags, vsync = self.vsync)
-        except pygame.error: ...
+        self._surface = pygame.display.set_mode((self.window.width, self.window.height), self.window.flags, vsync = self.vsync)
 
     def setScale(self, x: float, y: float) -> None:
         ...
 
-    def drawRect(self, x: int, y: int, width: int, height: int, color: Vector4 = None) -> None:
-        self.drawRectF(int(x), int(y), int(width), int(height), color)
+    def drawRect(self, position: Vector2, scale: Vector2, color: Vector4 = None) -> None:
+        self.drawRectF(*position.getInt(), *scale.getInt(), color)
 
-    def drawRectF(self, x: float, y: float, width: float, height: float, color: Vector4 = None) -> None:
+    def drawRectF(self, position: Vector2, scale: Vector2, color: Vector4 = None) -> None:
         if color != None: self.setDrawColor(color)
-        try: pygame.draw.rect(self._surface, self.drawColor.get()[:3], pygame.Rect(x, y, width, height), width = 1)
-        except pygame.error: ...
+        pygame.draw.rect(self._surface, self.drawColor.get()[:3], pygame.Rect(*position.get(), *scale.get()), width = 1)
 
-    def fillRect(self, x: int, y: int, width: int, height: int, color: Vector4 = None) -> None:
-        self.fillRectF(int(x), int(y), int(width), int(height), color)
+    def fillRect(self, position: Vector2, scale: Vector2, color: Vector4 = None) -> None:
+        self.fillRectF(*position.getInt(), *scale.getInt(), color)
 
-    def fillRectF(self, x: float, y: float, width: float, height: float, color: Vector4 = None) -> None:
+    def fillRectF(self, position: Vector2, scale: Vector2, color: Vector4 = None) -> None:
         if color != None: self.setDrawColor(color)
-        try: pygame.draw.rect(self._surface, self.drawColor.get()[:3], pygame.Rect(x, y, width, height), width = 0)
-        except pygame.error: ...
+        pygame.draw.rect(self._surface, self.drawColor.get()[:3], pygame.Rect(*position.get(), *scale.get()), width = 0)
+
+    def renderSurface(self, surface, position: Vector2, angle: float = 0.0) -> None:
+        _surface = pygame.transform.rotate(surface._surface.surface, -angle)
+        self._surface.blit(_surface, _surface.get_rect(center = _surface.get_rect(topleft = position.get()).center))
 
     def clear(self, color: Vector4 = None) -> None:
         if color != None: self.setDrawColor(color)
-        try: self._surface.fill(self.drawColor.get()[:3])
-        except pygame.error: ...
+        self._surface.fill(self.drawColor.get()[:3])
 
     def present(self) -> None:
-        try: pygame.display.flip()
-        except pygame.error: ...
+        pygame.display.flip()
 
     def terminate(self) -> None:
         ...

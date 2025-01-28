@@ -1,13 +1,15 @@
-import reforge, sdl2, sdl2.ext, ctypes, uuid
+import reforge, ctypes, uuid, sys
 
 from reforge.window import Window
 from reforge.math import Vector2
 from reforge.logger import LogLevel, Logger
 
+displaySize = None if sys.platform != "win32" \
+    else Vector2(ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
+
 class Context:
     def __init__(self, logLevel = LogLevel.Info) -> None:
         self.terminated, self.windows = False, {}
-        self.displaySize = Vector2(ctypes.windll.user32.GetSystemMetrics(0), ctypes.windll.user32.GetSystemMetrics(1))
         self._context, self.logger = reforge.api.Context(), Logger(logLevel)
         self.eventHandler, self.event = reforge.api.EventHandler(), reforge.api.Event()
 
@@ -20,7 +22,7 @@ class Context:
                 self.windows[_uuid].eventHandler(self.event)
 
         for _uuid in self.windows.copy():
-            self.windows[_uuid].input.onUpdate()
+            self.windows[_uuid].input.update()
 
         if len(self.windows) == 0:
             self.terminate()
@@ -51,5 +53,6 @@ class Context:
         if reforge.getContextCurrent() == self:
             reforge.setContextCurrent(None)
 
-        self._context.terminate()
-        self._context = None
+        if not (hasattr(self, "_preventTerminate") and self._preventTerminate):
+            self._context.terminate()
+            self._context = None

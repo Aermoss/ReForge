@@ -6,9 +6,10 @@ import atexit, sys
 
 sys.dont_write_bytecode = True
 
-from typing import List
+from typing import Any, Union, Tuple, List, Dict
 
-entryPoints = ["WinMain", "reforgeMain", "main", "reforgeEntry", "entry"]
+entryPoints = ["main", "reforgeMain", "entry", "reforgeEntry"] + ["WinMain"] if sys.platform == "win32" else []
+applicationCreations = ["createApplication", "reforgeCreateApplication"]
 exitSuccess, exitFailure = range(2)
 
 import reforge.api as api
@@ -21,11 +22,20 @@ def exitHandler() -> int:
     __main__ = __import__("__main__")
 
     for i in entryPoints:
-        if hasattr(__main__, i):
-            if len(api.initAPI()) == 0: print("NO API WAS INITIALIZED!")
-            result = getattr(__main__, i)(len(sys.argv), sys.argv)
-            api.terminateAPI()
-            return result
+        if not hasattr(__main__, i): continue
+        if not api.setCurrentAPI(os.environ.get("REFORGE_API")):
+            api.apiLog(api.apiLogType.FatalError, "invalid API specified in environment variable!", terminate = True)
+
+        if len(api.initAPI()) == 0:
+            api.apiLog(api.apiLogType.FatalError, "no API was initialized!", terminate = True)
+
+        exitCode = getattr(__main__, i)(len(sys.argv), sys.argv)
+        api.terminateAPI()
+        return exitCode
+        
+    for i in applicationCreations:
+        if not hasattr(__main__, i): continue
+        os._exit(getattr(__main__, i)(len(sys.argv), sys.argv).run())
 
 from reforge.context import *
 
@@ -38,11 +48,18 @@ def setContextCurrent(context) -> None:
 def getContextCurrent() -> Context:
     return contextCurrent
 
+applicationInstance = None
+
+from reforge.math import *
+from reforge.surface import *
 from reforge.renderer import *
+from reforge.font import *
 from reforge.scene import *
 from reforge.entity import *
 from reforge.components import *
 from reforge.logger import *
-from reforge.window import *
 from reforge.input import *
-from reforge.math import *
+from reforge.color import *
+from reforge.window import *
+from reforge.utils import *
+from reforge.application import *

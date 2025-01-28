@@ -16,12 +16,16 @@ class Renderer:
         self._renderer.present()
 
     def renderScene(self, scene: Scene):
-        for i in scene.getEntities():
-            if i.hasComponent(reforge.RectComponent):
-                rect = i.getComponent(reforge.RectComponent)
-                transform = i.getComponent(reforge.TransformComponent)
-                {True: self._renderer.fillRectF, False: self._renderer.drawRectF}[rect.fill] \
-                    (transform.position.x, transform.position.y, transform.scale.x, transform.scale.y, rect.color)
+        for entity in scene.getEntities():
+            transform = entity.getComponent(reforge.TransformComponent)
+
+            if entity.hasComponent(reforge.RectComponent):
+                (self._renderer.fillRectF if entity.getComponent(reforge.RectComponent).fill else self._renderer.drawRectF) \
+                    (transform.getWorldTranslation(), transform.getWorldScale(), entity.getComponent(reforge.RectComponent).color)
+                
+            if entity.hasComponent(reforge.TextComponent):
+                text = entity.getComponent(reforge.TextComponent)
+                self._renderer.renderSurface(text.surface, transform.getWorldTranslation())
 
     def terminate(self) -> None:
         self._renderer.terminate()

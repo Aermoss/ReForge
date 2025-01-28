@@ -1,8 +1,8 @@
-import reforge.api.tools, reforge.api.event, pygame, ctypes
+import reforge.api.instanceHandler, reforge.api.event, pygame, ctypes
 
 class EventHandler:
     def __init__(self) -> None:
-        reforge.api.tools.addInstance(__name__, self)
+        reforge.api.instanceHandler.addInstance(__name__, self)
         self.eventQueue = []
 
     def pollEvents(self, eventRef: object) -> bool:
@@ -11,19 +11,28 @@ class EventHandler:
 
         for event in events:
             if event.type == pygame.QUIT:
-                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.WindowClosed, windowID = None))
+                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.WindowClosed, windowId = None))
 
             elif event.type == pygame.MOUSEMOTION:
-                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.MouseMotion, windowID = None, x = event.pos[0], y = event.pos[1]))
+                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.MouseMotion, windowId = None, motion = reforge.Vector2(*event.pos)))
 
             elif event.type == pygame.MOUSEBUTTONUP:
-                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.MouseButtonUp, windowID = None, button = event.button))
+                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.MouseButtonUp, windowId = None, button = event.button))
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.MouseButtonDown, windowID = None, button = event.button))
+                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.MouseButtonDown, windowId = None, button = event.button))
 
             elif event.type == pygame.MOUSEWHEEL:
-                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.MouseWheel, x = event.x, y = event.y))
+                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.MouseWheel, windowId = None, wheel = reforge.Vector2(event.x, event.y)))
+
+            elif event.type == pygame.FINGERMOTION:
+                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.FingerMotion, windowId = None, fingerId = event.finger_id, motion = reforge.Vector2(event.x, event.y)))
+
+            elif event.type == pygame.FINGERUP:
+                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.FingerUp, windowId = None, fingerId = event.finger_id))
+
+            elif event.type == pygame.FINGERDOWN:
+                self.eventQueue.append(reforge.api.event.Event(type = reforge.api.event.EventType.FingerDown, windowId = None, fingerId = event.finger_id))
 
             else:
                 ...

@@ -1,4 +1,4 @@
-import reforge.api.tools as tools
+import reforge.api.instanceHandler as instanceHandler
 
-tools.initInstanceHandler(__name__)
-tools.importAllFilesInDirectory(__file__, __name__)
+instanceHandler.initInstanceHandler(__name__)
+instanceHandler.importAllFilesInDirectory(__file__, __name__)

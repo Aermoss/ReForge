@@ -1,14 +1,16 @@
-import reforge.api.tools, reforge.api.event, reforge.math, sdl2
+import reforge.api, sdl2, ctypes
+
+from reforge.math import Vector2, Vector3, Vector4
 
 class Renderer:
     def __init__(self, window, vsync = False) -> None:
-        reforge.api.tools.addInstance(__name__, self)
+        reforge.api.instanceHandler.addInstance(__name__, self)
         self.window, self.vsync = window, vsync
         flags = sdl2.SDL_RENDERER_ACCELERATED
         if vsync: flags |= sdl2.SDL_RENDERER_PRESENTVSYNC
         self._renderer = sdl2.SDL_CreateRenderer(self.window._window, -1, sdl2.SDL_RENDERER_ACCELERATED)
 
-    def setDrawColor(self, color: reforge.math.Vector4) -> None:
+    def setDrawColor(self, color: Vector4) -> None:
         sdl2.SDL_SetRenderDrawColor(self._renderer, *[int(i) for i in color.get()])
 
     def setViewport(self, x: int, y: int, width: int, height: int) -> None:
@@ -21,23 +23,38 @@ class Renderer:
     def setScale(self, x: float, y: float) -> None:
         sdl2.SDL_RenderSetScale(self._renderer, x, y)
 
-    def drawRect(self, x: int, y: int, width: int, height: int, color: reforge.math.Vector4 = None) -> None:
+    def drawRect(self, position: Vector2, scale: Vector2, color: Vector4 = None) -> None:
         if color != None: self.setDrawColor(color)
-        sdl2.SDL_RenderDrawRect(self._renderer, sdl2.SDL_Rect(int(x), int(y), int(width), int(height)))
+        sdl2.SDL_RenderDrawRect(self._renderer, sdl2.SDL_Rect(*position.getInt(), *scale.getInt()))
 
-    def drawRectF(self, x: float, y: float, width: float, height: float, color: reforge.math.Vector4 = None) -> None:
+    def drawRectF(self, position: Vector2, scale: Vector2, color: Vector4 = None) -> None:
         if color != None: self.setDrawColor(color)
-        sdl2.SDL_RenderDrawRectF(self._renderer, sdl2.SDL_FRect(float(x), float(y), float(width), float(height)))
+        sdl2.SDL_RenderDrawRectF(self._renderer, sdl2.SDL_FRect(*position.get(), *scale.get()))
 
-    def fillRect(self, x: int, y: int, width: int, height: int, color: reforge.math.Vector4 = None) -> None:
+    def fillRect(self, position: Vector2, scale: Vector2, color: Vector4 = None) -> None:
         if color != None: self.setDrawColor(color)
-        sdl2.SDL_RenderFillRect(self._renderer, sdl2.SDL_Rect(int(x), int(y), int(width), int(height)))
+        sdl2.SDL_RenderFillRect(self._renderer, sdl2.SDL_Rect(*position.getInt(), *scale.getInt()))
 
-    def fillRectF(self, x: float, y: float, width: float, height: float, color: reforge.math.Vector4 = None) -> None:
+    def fillRectF(self, position: Vector2, scale: Vector2, color: Vector4 = None) -> None:
         if color != None: self.setDrawColor(color)
-        sdl2.SDL_RenderFillRectF(self._renderer, sdl2.SDL_FRect(float(x), float(y), float(width), float(height)))
+        sdl2.SDL_RenderFillRectF(self._renderer, sdl2.SDL_FRect(*position.get(), *scale.get()))
 
-    def clear(self, color: reforge.math.Vector4 = None) -> None:
+    def createTextureFromSurface(self, surface) -> sdl2.SDL_Texture:
+        return sdl2.SDL_CreateTextureFromSurface(self._renderer, surface)
+    
+    def renderTexture(self, texture, position: Vector2, angle: float = 0.0, center: Vector2 = None) -> None:
+        width, height = ctypes.c_int(0), ctypes.c_int(0)
+        sdl2.SDL_QueryTexture(texture, None, None, ctypes.byref(width), ctypes.byref(height))
+        if center == None: center = Vector2(width.value / 2, height.value / 2)
+        sdl2.SDL_RenderCopyEx(self._renderer, texture, None, \
+            sdl2.SDL_Rect(*position.getInt(), width.value, height.value), angle, sdl2.SDL_Point(*center.getInt()), sdl2.SDL_FLIP_NONE)
+    
+    def renderSurface(self, surface, position: Vector2, angle: float = 0.0, center: Vector2 = None) -> None:
+        texture = self.createTextureFromSurface(surface._surface.surface)
+        self.renderTexture(texture, position, angle, center)
+        sdl2.SDL_DestroyTexture(texture)
+
+    def clear(self, color: Vector4 = None) -> None:
         if color != None: self.setDrawColor(color)
         sdl2.SDL_RenderClear(self._renderer)
 

@@ -1,7 +1,7 @@
 import reforge
 
 class LogLevel:
-    Null, Info, Warning, Error, FatalError = range(5)
+    Info, Warning, Error, FatalError, Null = range(5)
 
 class Logger:
     def __init__(self, logLevel = LogLevel.Info) -> None:

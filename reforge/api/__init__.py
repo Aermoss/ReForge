@@ -5,35 +5,39 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 if os.environ.get("PYSDL2_DLL_PATH") is None:
     import sdl2dll
 
-from reforge.api.tools import *
+from reforge.api.logger import *
+from reforge.api.instanceHandler import *
 from reforge.api.event import *
 
-from typing import List
+from typing import Any, Union, Tuple, List, Dict
 
-if "REFORGE_API" not in os.environ:
-    os.environ["REFORGE_API"] = "sdl2"
-
-NULL, PYGAME, SDL2 = range(-1, 2)
-currentAPI = SDL2 if os.environ.get("REFORGE_API").upper() == "SDL2" else PYGAME
-
+currentAPI = None
 initializedClasses = []
+apiModules = {}
+
+for i in os.listdir(os.path.dirname(__file__)):
+    if os.path.isdir(os.path.join(os.path.dirname(__file__), i)):
+        apiModules[i.lower()] = __import__("reforge.api." + i, fromlist = ["reforge", "api"])
 
 def initAPI() -> List[str]:
     initializedClasses.clear()
     apiModule = getAPIModule()
-    initInstanceHandler(apiModule.__name__)
-    module = sys.modules[__name__]
+    if apiModule is not None: initInstanceHandler(apiModule.__name__)
+    module, members = sys.modules[__name__], []
 
-    for i in list(set(dir(pygame)) & set(dir(sdl2))):
-        if i.startswith("_") or (False in [inspect.isclass(getattr(j, i)) for j in [pygame, sdl2]]) or not i[0].isupper(): continue
-        setattr(module, i, getattr(apiModule, i))
-        initializedClasses.append(i)
+    for i in [dir(j) for j in list(apiModules.values())]:
+        members.append(set(i))
+
+    for i in list(set.intersection(*members)):
+        if i.startswith("_") or (False in [inspect.isclass(getattr(j, i)) for j in list(apiModules.values())]) or not i[0].isupper(): continue
+        setattr(module, i, getattr(apiModule, i) if apiModule is not None else None)
+        if apiModule is not None: initializedClasses.append(i)
 
     import reforge, reforge.input
 
     for i in ["Key", "Button"]:
-        setattr(reforge, i, getattr(module, i))
-        
+        setattr(reforge, i, getattr(module, i) if apiModule is not None else None)
+
     return initializedClasses
 
 def terminateAPI() -> None:
@@ -49,17 +53,20 @@ def terminateAPI() -> None:
     for i in ["Key", "Button"]:
         delattr(reforge, i)
 
-def setCurrentAPI(api: int) -> None:
+def setCurrentAPI(api: str) -> None:
     global currentAPI
-    if currentAPI != NULL: terminateAPI()
-    currentAPI = api
-    if currentAPI != NULL: initAPI()
+    isInitialized = len(initializedClasses) != 0
+    if isInitialized: terminateAPI()
+    currentAPI = api.lower() if api.lower() in list(apiModules.keys()) else None
+    if isInitialized: initAPI()
+    return not (currentAPI is None and api is not None)
 
 def getCurrentAPI() -> int:
     return currentAPI
 
 def getAPIModule() -> object:
-    return {SDL2: sdl2, PYGAME: pygame}[getCurrentAPI()]
+    if getCurrentAPI() not in apiModules: return None
+    return apiModules.get(getCurrentAPI())
 
-import reforge.api.pygame as pygame
-import reforge.api.sdl2 as sdl2
+if len(initAPI()) != 0:
+    apiLog(apiLogType.FatalError, "something went wrong while initializing the API!", terminate = True)

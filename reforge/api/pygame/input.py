@@ -1,4 +1,4 @@
-import reforge.api.tools, pygame
+import reforge.api.instanceHandler, pygame
 
 class Key:
     Up, Down = pygame.K_UP, pygame.K_DOWN
@@ -49,7 +49,7 @@ class Keyboard:
 
 class Mouse:
     def __init__(self) -> None:
-        self.buttons = {}
+        self.buttons = {Button.Left: False, Button.Right: False, Button.Middle: False}
         self.position, self.scroll = reforge.Vector2(0, 0), 0
         self.positionChange, self.scrollChange = reforge.Vector2(0, 0), 0
         self._lastPosition, self._lastScroll = reforge.Vector2(0, 0), 0
@@ -70,7 +70,7 @@ class Mouse:
 
 class Input:
     def __init__(self, window) -> None:
-        reforge.api.tools.addInstance(__name__, self)
+        reforge.api.instanceHandler.addInstance(__name__, self)
         self._window = window
         self.keyboard, self.mouse = reforge.api.Keyboard(), reforge.api.Mouse()
 
@@ -81,19 +81,23 @@ class Input:
     def eventHandler(self, event: object) -> None:
         match event.type:
             case reforge.api.EventType.MouseMotion:
-                if event.windowID is None or (event.windowID is not None and event.windowID == self._window._windowID):
-                    self.mouse.position.x, self.mouse.position.y = event.x, event.y
+                if event.windowId is None or (event.windowId is not None and event.windowId == self._window._windowID):
+                    self.mouse.position = event.motion.copy()
 
             case reforge.api.EventType.MouseButtonUp:
-                if event.windowID is None or (event.windowID is not None and event.windowID == self._window._windowID):
+                if event.windowId is None or (event.windowId is not None and event.windowId == self._window._windowID):
                     self.mouse.buttons[event.button] = False
 
             case reforge.api.EventType.MouseButtonDown:
-                if event.windowID is None or (event.windowID is not None and event.windowID == self._window._windowID):
+                if event.windowId is None or (event.windowId is not None and event.windowId == self._window._windowID):
                     self.mouse.buttons[event.button] = True
 
             case reforge.api.EventType.MouseWheel:
-                self.mouse.scroll += event.y
+                if event.windowId is None or (event.windowId is not None and event.windowId == self._window._windowID):
+                    self.mouse.scroll += event.wheel.y
+
+            case _:
+                ...
 
     def terminate(self):
         self.keyboard.terminate()

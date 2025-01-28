@@ -1,5 +1,5 @@
 class EventType:
-    Null, WindowClosed, MouseMotion, MouseButtonUp, MouseButtonDown, MouseWheel = range(6)
+    Null, WindowClosed, MouseMotion, MouseButtonUp, MouseButtonDown, MouseWheel, FingerMotion, FingerUp, FingerDown = range(9)
 
 class Event:
     def __init__(self, type = EventType.Null, *args, **kwargs) -> None:

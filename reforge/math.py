@@ -1,4 +1,4 @@
-import reforge, math
+import math
 
 def lerp(a: object, b : object, value: float) -> object:
     if isinstance(a, int) or isinstance(a, float):
@@ -6,7 +6,7 @@ def lerp(a: object, b : object, value: float) -> object:
 
     elif isinstance(a, tuple):
         if len(a) != len(b): raise TypeError("tuple sizes doesn't match")
-        return (lerp(x, y, value) for x, y in zip(a, b))
+        return (*[lerp(x, y, value) for x, y in zip(a, b)], )
 
     elif isinstance(a, Vector2):
         return Vector2(lerp(a.x, b.x, value), lerp(a.y, b.y, value))
@@ -23,10 +23,10 @@ def lerp(a: object, b : object, value: float) -> object:
 def clamp(a: object, min: object, max: object) -> object:
     if isinstance(a, int) or isinstance(a, float):
         return min if a < min else max if a > max else a
-
+    
     elif isinstance(a, tuple):
         if len(a) != len(min) or len(a) != len(max): raise TypeError("tuple sizes doesn't match")
-        return (clamp(x, y, z) for x, y, z in zip(a, min, max))
+        return (*[clamp(x, y, z) for x, y, z in zip(a, min, max)], )
 
     elif isinstance(a, Vector2):
         return Vector2(clamp(a.x, min.x, max.x), clamp(a.y, min.y, max.y))
@@ -65,7 +65,7 @@ def sqrt(a: object) -> object:
         return math.sqrt(a)
 
     elif isinstance(a, tuple):
-        return (sqrt(x) for x in a)
+        return (*[sqrt(x) for x in a], )
 
     elif isinstance(a, Vector2):
         return Vector2(sqrt(a.x), sqrt(a.y))
@@ -103,7 +103,7 @@ def normalize(a: object) -> object:
         return a / length(a)
 
     elif isinstance(a, tuple):
-        return (x / length(a) for x in a)
+        return (*[x / length(a) for x in a], )
 
     elif isinstance(a, Vector2):
         return a / length(a)
@@ -160,11 +160,15 @@ def refract(a: object, b: object, eta: float) -> object:
         raise TypeError("expected Vector2, Vector3 or Vector4, got " + str(type(a)))
 
 class Vector2:
-    def __init__(self, x: float, y: float) -> None:
+    def __init__(self, x: float, y: float = None) -> None:
+        if y is None: y = x
         self.x, self.y = x, y
 
     def get(self) -> tuple:
         return (self.x, self.y)
+    
+    def getInt(self) -> tuple:
+        return (int(self.x), int(self.y))
 
     def copy(self) -> object:
         return Vector2(self.x, self.y)
@@ -201,11 +205,15 @@ class Vector2:
         return f"Vector2({self.x}, {self.y})"
 
 class Vector3:
-    def __init__(self, x: float, y: float, z: float) -> None:
+    def __init__(self, x: float, y: float = None, z: float = None) -> None:
+        if y is None and z is None: y, z = x, x
         self.x, self.y, self.z = x, y, z
 
     def get(self) -> tuple:
         return (self.x, self.y, self.z)
+    
+    def getInt(self) -> tuple:
+        return (int(self.x), int(self.y), int(self.z))
 
     def copy(self) -> object:
         return Vector3(self.x, self.y, self.z)
@@ -242,11 +250,15 @@ class Vector3:
         return f"Vector3({self.x}, {self.y}, {self.z})"
 
 class Vector4:
-    def __init__(self, x: float, y: float, z: float, w: float) -> None:
+    def __init__(self, x: float, y: float = None, z: float = None, w: float = None) -> None:
+        if y is None and z is None and w is None: y, z, w = x, x, x
         self.x, self.y, self.z, self.w = x, y, z, w
 
     def get(self) -> tuple:
         return (self.x, self.y, self.z, self.w)
+    
+    def getInt(self) -> tuple:
+        return (int(self.x), int(self.y), int(self.z), int(self.w))
 
     def copy(self) -> object:
         return Vector4(self.x, self.y, self.z, self.w)
