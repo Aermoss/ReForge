@@ -1,5 +1,5 @@
-# ReForge - Forge IV
-A 2D game engine written in Python using both SDL2 and PyGame.
+# ReForge [Forge IV]
+A 2D game engine written in Python using both PyGame, PySDL2 and PySDL3.
 
 # Getting Started
 ## How to install.
