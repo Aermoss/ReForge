@@ -1,6 +1,4 @@
-__author__ = "Yusuf Rençber"
-__requirements__ = ["pygame", "pysdl2", "pysdl2-dll"]
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 import atexit, sys
 
