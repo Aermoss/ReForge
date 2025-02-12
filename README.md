@@ -12,7 +12,7 @@ pip install ReForge
 ```python
 import os
 
-os.environ["REFORGE_API"] = "sdl2"
+os.environ["REFORGE_API"] = "sdl3"
 
 import reforge, ctypes
 
@@ -38,7 +38,7 @@ def reforgeEntry(argc: int, argv: reforge.List[str]) -> int:
 ```python
 import os
 
-os.environ["REFORGE_API"] = "sdl2"
+os.environ["REFORGE_API"] = "sdl3"
 
 import reforge, ctypes
 
@@ -71,7 +71,7 @@ def reforgeEntry(argc: int, argv: reforge.List[str]) -> int:
 ```python
 import os
 
-os.environ["REFORGE_API"] = "sdl2"
+os.environ["REFORGE_API"] = "sdl3"
 
 import reforge, ctypes
 
