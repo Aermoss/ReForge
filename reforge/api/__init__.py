@@ -9,8 +9,6 @@ from reforge.api.logger import *
 from reforge.api.instanceHandler import *
 from reforge.api.event import *
 
-from typing import Any, Union, Tuple, List, Dict
-
 currentAPI = None
 initializedClasses = []
 apiModules = {}
@@ -19,7 +17,7 @@ for i in os.listdir(os.path.dirname(__file__)):
     if os.path.isdir(os.path.join(os.path.dirname(__file__), i)):
         apiModules[i.lower()] = __import__("reforge.api." + i, fromlist = ["reforge", "api"])
 
-def initAPI() -> List[str]:
+def initAPI() -> list[str]:
     initializedClasses.clear()
     apiModule = getAPIModule()
     if apiModule is not None: initInstanceHandler(apiModule.__name__)

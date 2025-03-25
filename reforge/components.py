@@ -47,7 +47,7 @@ class TransformComponent(Component):
         else: return self.__scale * self.entity.getComponent(RelationshipComponent).getParent().getComponent(TransformComponent).getWorldScale()
 
 class RelationshipComponent(Component):
-    def __init__(self, parent: object = None, children: reforge.Dict[uuid.uuid4, object] = {}) -> None:
+    def __init__(self, parent: object = None, children: dict[uuid.uuid4, object] = {}) -> None:
         self.parent, self.children = parent, children
 
     def setParent(self, parent: object) -> None:

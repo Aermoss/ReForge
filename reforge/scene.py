@@ -6,7 +6,7 @@ class Scene:
     def __init__(self) -> None:
         self.entities = {}
 
-    def getEntities(self) -> reforge.List[Entity]:
+    def getEntities(self) -> list[Entity]:
         return list(self.entities.values())
 
     def registerEntity(self, entity: Entity, name: str = None, parent: Entity = None) -> None:

@@ -16,7 +16,7 @@ os.environ["REFORGE_API"] = "sdl3"
 
 import reforge, ctypes
 
-def reforgeEntry(argc: int, argv: reforge.List[str]) -> int:
+def reforgeEntry(argc: int, argv: list[str]) -> int:
     context = reforge.Context()
     context.makeContextCurrent()
     window = reforge.Window(title = "ReForge", width = 1200, height = 600)
@@ -42,7 +42,7 @@ os.environ["REFORGE_API"] = "sdl3"
 
 import reforge, ctypes
 
-def reforgeEntry(argc: int, argv: reforge.List[str]) -> int:
+def reforgeEntry(argc: int, argv: list[str]) -> int:
     context = reforge.Context()
     context.makeContextCurrent()
     window = reforge.Window(title = "ReForge", width = 1200, height = 600)
@@ -75,7 +75,7 @@ os.environ["REFORGE_API"] = "sdl3"
 
 import reforge, ctypes
 
-def reforgeEntry(argc: int, argv: reforge.List[str]) -> int:
+def reforgeEntry(argc: int, argv: list[str]) -> int:
     context = reforge.api.Context()
     window = reforge.api.Window(title = "ReForge", width = 1200, height = 600)
     renderer = reforge.api.Renderer(window)

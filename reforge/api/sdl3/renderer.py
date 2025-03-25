@@ -37,7 +37,7 @@ class Renderer:
         if color != None: self.setDrawColor(color)
         sdl3.SDL_RenderFillRect(self._renderer, sdl3.SDL_FRect(*position.get(), *scale.get()))
 
-    def createTextureFromSurface(self, surface) -> sdl3.LP_SDL_Texture:
+    def createTextureFromSurface(self, surface) -> sdl3.SDL_POINTER[sdl3.SDL_Texture]:
         return sdl3.SDL_CreateTextureFromSurface(self._renderer, surface)
     
     def renderTexture(self, texture, position: Vector2, angle: float = 0.0, center: Vector2 = None) -> None:

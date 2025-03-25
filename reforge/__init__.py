@@ -4,7 +4,7 @@ import atexit, sys
 
 sys.dont_write_bytecode = True
 
-from typing import Any, Union, Tuple, List, Dict
+from typing import Any
 
 entryPoints = ["main", "reforgeMain", "entry", "reforgeEntry"] + ["WinMain"] if sys.platform == "win32" else []
 applicationCreations = ["createApplication", "reforgeCreateApplication"]
